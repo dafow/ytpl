@@ -1,0 +1,13 @@
+GET /api/playlists/:id
+	returns JSON for playlist ressource with _id=:id
+GET /api/playlists
+	returns JSON collection of playlists with id and name only
+GET /api/video/:vid
+	returns JSON for video ressource with _id=:vid
+	
+POST /api/playlists { id: pid }
+	create playlist with id=pid
+	
+UPDATE /api/video/:vid POST BODY { id: vid, name: newName }
+	updates the video name to newName for video with id=vid
+	
