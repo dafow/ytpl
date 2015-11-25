@@ -5,6 +5,7 @@
 
 var mongoose = require('mongoose');
 var home = require('../app/controllers/home');
+var playlists = require('../app/controllers/playlists');
 
 /**
  * Expose
@@ -13,6 +14,7 @@ var home = require('../app/controllers/home');
 module.exports = function (app, passport) {
 
   app.get('/', home.index);
+  app.get('/playlists', playlists.index);
 
   /**
    * Error handling
