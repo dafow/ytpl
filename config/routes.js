@@ -15,6 +15,9 @@ module.exports = function (app, passport) {
 
   app.get('/', home.index);
   app.get('/playlists', playlists.index);
+  app.get('/playlists/:id', playlists.get);
+  
+  app.post('/playlists', playlists.insert);
 
   /**
    * Error handling

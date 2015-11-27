@@ -11,8 +11,9 @@ var Schema = mongoose.Schema;
  */
 
 var PlaylistSchema = new Schema({
-  ytid: { type: String, default: '' },
-  name: { type: String, default: '' }
+  _id: String,
+  name: { type: String, default: '' },
+  user: { type: String, ref: 'User' }
 });
 
 /**
@@ -43,6 +44,11 @@ PlaylistSchema.static({
 			.limit(limit)
 			.skip(limit * page)
 			.select('name')
+			.exec();
+	},
+	
+	get: function(id) {
+		return this.findOne({ _id: id })
 			.exec();
 	}
 });

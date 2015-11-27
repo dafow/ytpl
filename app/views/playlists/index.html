@@ -7,7 +7,7 @@
 {% block content %}
   <ul>
 	{% for playlist in playlists %}
-	<li>{{ playlist|json }}</li>
+	<li><a href="/playlists/{{ playlist._id }}">{{ playlist|json }}</a></li>
 	{% endfor %}
   </ul>
 {% endblock %}
