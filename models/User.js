@@ -17,7 +17,9 @@ const userSchema = new mongoose.Schema({
     location: String,
     website: String,
     picture: String
-  }
+  },
+  
+  playlists: [String]
 }, { timestamps: true });
 
 /**
