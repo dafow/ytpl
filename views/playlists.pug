@@ -1,14 +1,22 @@
 extends layout
 
 block content
-  h1 Current Playlists
-  p.Browse your saved playlists
-  hr
-  .row
-    .col-sm-3
-      h2 Heading
-      p Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
-      p
-        a.btn.btn-default(href='#', role='button') View details »
-	.col-sm-9
-	  
+	h1 Current Playlists
+	p Browse your saved playlists
+	hr
+	.row
+		.col-sm-3
+			form.form-horizontal(action='/playlists/create', method='POST')
+				input(type='hidden', name='_csrf', value=_csrf)
+				.form-group(style='margin-left:0')
+					input.form-control(type='text', name='plURL', id='plURL', placeholder='Youtube Playlist URL', autofocus, required)
+					button.btn.btn-success(type='submit')
+						i.fa.fa-plus
+						| Add
+			hr
+			
+			ul.list-group
+				each item in playlists
+					a(href='/playlists/' + item.id)
+						li.list-group-item= item.title
+		.col-sm-9

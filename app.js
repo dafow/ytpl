@@ -127,7 +127,8 @@ app.post('/reset/:token', userController.postReset);
 app.get('/signup', userController.getSignup);
 app.post('/signup', userController.postSignup);
 
-app.get('/playlists', playlistsController.index);
+app.get('/playlists', passportConfig.isAuthenticated, playlistsController.index);
+app.post('/playlists/create', passportConfig.isAuthenticated, playlistsController.create);
 
 app.get('/contact', contactController.getContact);
 app.post('/contact', contactController.postContact);
