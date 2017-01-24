@@ -80,11 +80,11 @@ exports.create = (req, res, next) => {
 							}
 						}
 						catch (JSONerr) {
-							next(JSONerr);
+							return next(JSONerr);
 						}
 					}
 					else {
-						next(err);
+						return next(err);
 					}
 				});
 			}
@@ -94,11 +94,32 @@ exports.create = (req, res, next) => {
 		user.save((err, updatedUser) => {
 			if (err) { return next(err); }
 			req.flash('success', { msg: 'Playlist successfully added' });
-			res.redirect('/playlists');
+			return res.redirect('/playlists');
 		});
 	});
 };
 
-exports.update = (req, res, next) => {
-
+exports.sync = (req, res, next) => {
+	//check if playlist has been updated since
+	const playlistCheck = `https://www.googleapis.com/youtube/v3/playlists?part=id&id=${req.params.ytid}&key=${process.env.YOUTUBE_KEY}`;
+	request(playlistCheck, (err, res, body) => {
+		if (err) { return next(err); }
+		if (res.statusCode != 200) { return next('Youtube API returned an error while retrieving playlist'); }
+		
+		//If playlist is retrievable, then it's not private or deleted
+		try {
+			const playlist = JSON.parse(body);
+			if (playlist.items.length > 0) {
+				//Start syncing
+				
+			}
+			else {
+				return next('Youtube API returned an error while retrieving playlist');
+			}
+		}
+		catch (JSONerr) {
+			return next(JSONerr);
+		}
+		console.log(body);
+	});
 };
