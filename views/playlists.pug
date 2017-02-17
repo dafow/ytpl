@@ -5,7 +5,7 @@ block content
 	p Browse your saved playlists
 	hr
 	.row
-		.col-sm-3
+		.col-sm-12
 			form.form-horizontal(action='/playlists/create', method='POST')
 				input(type='hidden', name='_csrf', value=_csrf)
 				.form-group(style='margin-left:0')
@@ -19,4 +19,3 @@ block content
 				each item in playlists
 					a(href='/playlists/' + item.id)
 						li.list-group-item= item.title
-		.col-sm-9

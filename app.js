@@ -128,6 +128,7 @@ app.get('/signup', userController.getSignup);
 app.post('/signup', userController.postSignup);
 
 app.get('/playlists', passportConfig.isAuthenticated, playlistsController.index);
+app.get('/playlists/:ytid', passportConfig.isAuthenticated, playlistsController.show);
 app.put('/playlists/update/:ytid', passportConfig.isAuthenticated, playlistsController.sync);
 app.post('/playlists/create', passportConfig.isAuthenticated, playlistsController.create);
 

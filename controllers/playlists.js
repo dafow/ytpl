@@ -1,6 +1,7 @@
 const request = require('request');
 const url = require('url');
 const async = require('async');
+const Promise = require('promise');
 const Playlist = require('../models/Playlist');
 const User = require('../models/User');
 
@@ -10,27 +11,12 @@ const User = require('../models/User');
  * Playlists index page.
  */
 exports.index = (req, res) => {
-	var userPlaylists = [];
-	async.each(req.user.playlists, (id, callback) => {
-		Playlist.findOne({ ytid: id }, (err, playlist) => {
-			if (err) { console.log(err); }
-			if (playlist) {
-				userPlaylists.push({ title: playlist.title, id: playlist.ytid});
-				callback();
-			}
-			else {
-				callback("Couldn't find matching playlist on /playlists");
-			}
+	Playlist.findUserPlaylists(req.user.playlists).then(function(result) {
+		res.render('playlists', {
+			title: 'Playlists',
+			playlists: result
 		});
-	}, (err) => {
-		if (err) { console.log(err); }
-		else {
-			res.render('playlists', {
-				title: 'Playlists',
-				playlists: userPlaylists
-			});
-		}
-	});
+	}, function(error) { console.log(error); });
 };
 
 /**
@@ -99,6 +85,18 @@ exports.create = (req, res, next) => {
 	});
 };
 
+exports.show = (req, res, next) => {
+	const playlist = Playlist.findOne({ ytid: playlistId }, (err, pl) => {
+		if (err) { next(err); }
+		return pl;
+	});
+	
+	res.render('playlists', {
+		title: 'Playlists',
+		playlist: pl
+	});
+};
+
 exports.sync = (req, res, next) => {
 	//check if playlist has been updated since
 	const playlistCheck = `https://www.googleapis.com/youtube/v3/playlists?part=id&id=${req.params.ytid}&key=${process.env.YOUTUBE_KEY}`;
@@ -111,7 +109,7 @@ exports.sync = (req, res, next) => {
 			const playlist = JSON.parse(body);
 			if (playlist.items.length > 0) {
 				//Start syncing
-				
+				console.log(playlist);
 			}
 			else {
 				return next('Youtube API returned an error while retrieving playlist');
