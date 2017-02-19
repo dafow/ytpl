@@ -68,3 +68,16 @@ textarea {
 .fa {
   margin-right: 6px;
 }
+
+// Playlist
+// -------------------------
+.playlist-header {
+	display: flex;
+	align-items: center;
+	
+	.refresh-all {
+		height: 50%;
+		margin-left: 1%;
+		margin-top: 10px;
+	}
+}

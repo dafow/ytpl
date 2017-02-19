@@ -1,0 +1,17 @@
+extends ../layout
+
+block content
+	div.playlist-header
+		h1= playlist.title
+		button(type='button' class='btn btn-default refresh-all' data-ytid=playlist.ytid)
+			i(class='fa fa-refresh' aria-hidden='true')
+	p Browse and sync your playlist
+	hr
+	.row
+		.col-sm-12
+			ul.list-group
+				if playlist && playlist.length > 0
+					each item in playlist
+						li.list-group-item= item.title
+				else
+					p Your playlist is empty

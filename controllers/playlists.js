@@ -86,30 +86,29 @@ exports.create = (req, res, next) => {
 };
 
 exports.show = (req, res, next) => {
-	const playlist = Playlist.findOne({ ytid: playlistId }, (err, pl) => {
+	const playlist = Playlist.findOne({ ytid: req.params.ytid }, (err, pl) => {
 		if (err) { next(err); }
-		return pl;
-	});
-	
-	res.render('playlists', {
-		title: 'Playlists',
-		playlist: pl
+		console.log(pl);
+		res.render('playlists/videos', {
+			title: 'Playlists',
+			playlist: pl
+		});
 	});
 };
 
 exports.sync = (req, res, next) => {
 	//check if playlist has been updated since
 	const playlistCheck = `https://www.googleapis.com/youtube/v3/playlists?part=id&id=${req.params.ytid}&key=${process.env.YOUTUBE_KEY}`;
-	request(playlistCheck, (err, res, body) => {
+	request(playlistCheck, (err, response, body) => {
 		if (err) { return next(err); }
-		if (res.statusCode != 200) { return next('Youtube API returned an error while retrieving playlist'); }
+		if (response.statusCode != 200) { return next('Youtube API returned an error while retrieving playlist'); }
 		
 		//If playlist is retrievable, then it's not private or deleted
 		try {
 			const playlist = JSON.parse(body);
 			if (playlist.items.length > 0) {
 				//Start syncing
-				console.log(playlist);
+				res.json(playlist);
 			}
 			else {
 				return next('Youtube API returned an error while retrieving playlist');
@@ -118,6 +117,5 @@ exports.sync = (req, res, next) => {
 		catch (JSONerr) {
 			return next(JSONerr);
 		}
-		console.log(body);
 	});
 };
