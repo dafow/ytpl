@@ -31,7 +31,23 @@ playlistSchema.statics.findUserPlaylists = function(userPlaylistsIds) {
 			}
 		});
 	});
-}
+};
+
+playlistSchema.statics.sync = function(playlist, stats) {
+	var that = this;
+	return new Promise(function(resolve, reject) {
+		async.each(
+			playlist,
+			function(item, callback) {
+				
+			},
+			function(err, result) {
+				if (err) reject(err);
+				resolve(result);
+			}
+		);
+	});
+};
 
 const Playlist = mongoose.model('Playlist', playlistSchema);
 

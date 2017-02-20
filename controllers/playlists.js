@@ -11,6 +11,7 @@ const User = require('../models/User');
  * Playlists index page.
  */
 exports.index = (req, res) => {
+	console.log("showing index");
 	Playlist.findUserPlaylists(req.user.playlists).then(function(result) {
 		res.render('playlists', {
 			title: 'Playlists',
@@ -74,21 +75,23 @@ exports.create = (req, res, next) => {
 					}
 				});
 			}
+			console.log("creating new playlist...");
+			user.playlists.push(playlistId);
+			user.save((err, updatedUser) => {
+				if (err) { return next(err); }
+				console.log("saving user...");
+				req.flash('success', { msg: 'Playlist successfully added' });
+				return res.redirect('/playlists');
+			});
 		});
 		
-		user.playlists.push(playlistId);
-		user.save((err, updatedUser) => {
-			if (err) { return next(err); }
-			req.flash('success', { msg: 'Playlist successfully added' });
-			return res.redirect('/playlists');
-		});
 	});
 };
 
 exports.show = (req, res, next) => {
 	const playlist = Playlist.findOne({ ytid: req.params.ytid }, (err, pl) => {
 		if (err) { next(err); }
-		console.log(pl);
+		
 		res.render('playlists/videos', {
 			title: 'Playlists',
 			playlist: pl
@@ -96,26 +99,77 @@ exports.show = (req, res, next) => {
 	});
 };
 
+//need to refactor getting playlist info, json parsing...
 exports.sync = (req, res, next) => {
 	//check if playlist has been updated since
-	const playlistCheck = `https://www.googleapis.com/youtube/v3/playlists?part=id&id=${req.params.ytid}&key=${process.env.YOUTUBE_KEY}`;
-	request(playlistCheck, (err, response, body) => {
+	const getPlaylistItemsUrl = `https://www.googleapis.com/youtube/v3/playlistItems?key=${process.env.YOUTUBE_KEY}&` +
+			`part=snippet,id,status&fields=nextPageToken,pageInfo,items(snippet(title,description,thumbnails(default,medium),resourceId/videoId),status)` +
+			`&maxResults=50&playlistId=${req.params.ytid}`;
+	request(getPlaylistItemsUrl, (err, response, body) => {
 		if (err) { return next(err); }
-		if (response.statusCode != 200) { return next('Youtube API returned an error while retrieving playlist'); }
-		
-		//If playlist is retrievable, then it's not private or deleted
+		if (response.statusCode != 200) {
+			try {
+				const error = JSON.parse(body);
+				return next(error);
+			}
+			catch (JSONerr) {
+				return next('Youtube API returned an error while retrieving playlist (error message parse failed): ' + JSONerr);
+			}
+		}
+		//Check number of pages of results to check, and sync each page
 		try {
-			const playlist = JSON.parse(body);
-			if (playlist.items.length > 0) {
-				//Start syncing
-				res.json(playlist);
+			var playlistItems = JSON.parse(body);
+			var stats = {
+				"deleted": [],
+				"private": [],
+				"playlist_deleted": []
+			};
+			if (playlistItems.nextPageToken) {
+				async.whilst(
+					function() { return playlistItems.nextPageToken !== undefined },
+					function(callback) {
+						console.log("Getting next page..." + playlistItems.nextPageToken);
+						var getNextPageUrl = getPlaylistItemsUrl + '&pageToken=' + playlistItems.nextPageToken;
+						request(getNextPageUrl, (err, response, body) => {
+							if (err) { return callback(err); }
+							if (response.statusCode != 200) {
+								try {
+									const error = JSON.parse(body);
+									callback(error);
+								}
+								catch (JSONerr) {
+									callback('Youtube API returned an error while retrieving playlist (error message parse failed): ' + JSONerr);
+								}
+							}
+							
+							//Update current page
+							try {
+								playlistItems = JSON.parse(body);
+								
+								//Send current page to model to sync
+								Playlist.sync(playlistItems, stats).then(function(result) {
+									callback(null, result);
+								}, function(error) { callback(error); });
+							}
+							catch (JSONerr) {
+								callback('Youtube API returned an error while retrieving playlist (error message parse failed): ' + JSONerr);
+							}
+						});
+					},
+					function(err, stats) {
+						if (err) { console.log("async.whilst error:" + err); }
+						res.json(JSON.stringify(stats));
+					}
+				);
 			}
 			else {
-				return next('Youtube API returned an error while retrieving playlist');
+				Playlist.sync(playlistItems, stats).then(function(result) {
+					res.json(JSON.stringify(stats));
+				}, function(error) { next(error); });
 			}
 		}
 		catch (JSONerr) {
-			return next(JSONerr);
+			return next('PlaylistItems response sync failed: ' + JSONerr);
 		}
 	});
 };
