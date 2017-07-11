@@ -136,7 +136,8 @@ class Playlist extends Controller {
 				$playlistsMapper->load(array('id=?', $plid));
 				
 				if (!$playlistsMapper->dry()) {
-					$dbVideos = $db->exec("SELECT * FROM videos WHERE id IN ($playlistsMapper->videos)");
+					$dbVideos = is_null($playlistsMapper->videos) ?
+								array() : $db->exec("SELECT * FROM videos WHERE id IN ($playlistsMapper->videos)");
 					
 					//get youtube playlist items
 					require_once dirname(__FILE__) . '/ext/youtubeapi.php';
@@ -163,22 +164,61 @@ class Playlist extends Controller {
 						//compare both playlists collections
 						$videosMapper = new DB\SQL\Mapper($db, 'videos');
 						foreach($ytVideos['items'] as $ytVideo) {
-							//echo "<pre>";var_dump($ytVideo);echo "</pre>";
+							//find corresponding video in the database
 							$dbVideoKey = array_search($ytVideo['snippet']['resourceId']['videoId'], array_column($dbVideos, 'ytid'));
 							if ($dbVideoKey !== false) {
 								$dbVideo = $dbVideos[$dbVideoKey];
 								
 								$videosMapper->reset();
-								$videosMapper->load(array('id=?', $dbVideos['id']));
-								//compare title
-								if ($dbVideo['currentTitle'] != $ytVideo['snippet']['title']) {
-									if (!is_null($videosMapper->history) || empty($videosMapper->history)) {
-										$videosMapper->history = $dbVideo['currentTitle'];
+								$videosMapper->load(array('id=?', $dbVideo['id']));
+								
+								if (!$videosMapper->dry()) {
+									//compare titles
+									if ($dbVideo['currentTitle'] != $ytVideo['snippet']['title']) {
+										//if they are different, add the name to the video's name history
+										if (!is_null($videosMapper->titleHistory) || empty($videosMapper->titleHistory)) {
+											$videosMapper->titleHistory = $dbVideo['currentTitle'];
+										}
+										else {
+											$titleHistory = explode(";", $videosMapper->titleHistory);
+											//check if the name isn't already in the history
+											if (!in_array(str_replace(";", ",", $ytVideo['snippet']['title']), $titleHistory)) {
+												$videosMapper->titleHistory .= $videosMapper->titleHistory . ";" . $ytVideo['snippet']['title'];
+											}
+										}
+										
+										if ($videosMapper->forceTitleOverwrite == 1) {
+											$videosMapper->currentTitle = $ytVideo['snippet']['title'];
+										}
 									}
-									else {
-										$titleHistory = explode("");
+									
+									$videosMapper->status = $ytVideo['status']['privacyStatus'];
+									if (isset($ytVideo['snippet']['thumbnails'])) {
+										$videosMapper->thumbnails = $ytVideo['snippet']['thumbnails']['high']['url'];
 									}
+									
+									$videosMapper->save();
 								}
+							}
+							
+							else {
+								//add the video to the database and to the user's playlist
+								$videosMapper->reset();
+								$videosMapper->ytid = $ytVideo['snippet']['resourceId']['videoId'];
+								$videosMapper->currentTitle = $ytVideo['snippet']['title'];
+								$videosMapper->thumbnails = isset($ytVideo['snippet']['thumbnails']) ? 
+															$ytVideo['snippet']['thumbnails']['high']['url'] : null;
+								$videosMapper->publishedAt = $ytVideo['snippet']['publishedAt'];
+								$videosMapper->status = $ytVideo['status']['privacyStatus'];
+								$videosMapper->save();
+								
+								if (is_null($playlistsMapper->videos)) {
+									$playlistsMapper->videos = $videosMapper->id;
+								}
+								else {
+									$playlistsMapper->videos .= "," . $videosMapper->id;
+								}
+								$playlistsMapper->save();
 							}
 						}
 					}

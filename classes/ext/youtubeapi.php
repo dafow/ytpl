@@ -52,7 +52,7 @@ class Youtubeapi {
 		);
 		
 		$json = json_decode($res['body'], true);
-		//echo "<pre>";echo var_dump($res);echo "</pre>";
+		echo "<pre>";echo var_dump($res);echo "</pre>";
 		if (json_last_error() === JSON_ERROR_NONE && $res['headers'][0] == "HTTP/1.1 200 OK") {
 			return $json;
 		}
