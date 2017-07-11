@@ -1,4 +1,4 @@
-<include href="header.htm" />
+<?php echo \Template::instance()->render('header.htm'); ?>
 
 <div class="container-fluid">
 	
@@ -6,15 +6,31 @@
 		<div class="col-xs-1 col-sm-3"></div>
 		<div class="col-xs-10 col-sm-6">
 		
-			<form id="sync" method="post" action="{{ @BASE }}/playlists/{{ @plid }}/sync">
+			<h2><?= $playlistTitle ?></h2>
+			
+			<form id="sync" method="post" action="<?= $BASE ?>/playlists/<?= $plid ?>/sync">
 				<input type="hidden" name="plid" value="{{ @plid }}" />
 				<input type="submit" value="Sync" class="btn btn-default" />
 			</form>
 			
 			<div class="row videos">
-				<repeat group="{{ @videos }}" value="{{ @video }}">
-					<span>{{ @video.currentTitle }}</span>
-				</repeat>
+				<?php foreach($videos as $video): ?>
+					<?php
+						$videoClasses = "";
+						if (is_null($video['thumbnails'])) $videoClasses .= ' deleted';
+						if ($video['status'] == 'private') $videoClasses .= ' private';
+					?>
+					<div class="media video<?= $videoClasses ?>">
+						<div class="media-left media-middle">
+							<a href="https://www.youtube.com/watch?v=<?= $video['ytid'] ?>" target="_blank">
+								<img class="media-object" style="width: 64px; height: 64px;" src="<?= $video['thumbnails'] ?>">
+							</a>
+						</div>
+						<div class="media-body">
+							<p><?= $video['currentTitle'] ?></p>
+						</div>
+					</div>
+				<?php endforeach; ?>
 			</div>
 			
 		</div>
@@ -23,4 +39,4 @@
 	
 </div>
 
-<include href="footer.htm" />
+<?php echo \Template::instance()->render('footer.htm'); ?>

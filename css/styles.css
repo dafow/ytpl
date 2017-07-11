@@ -1,0 +1,20 @@
+.videos {
+	margin-top: 20px;
+}
+
+.videos .video {
+	padding: 20px;
+	background-color: #f5f5f5;
+}
+
+.videos .video.deleted {
+	background-color: #f26b5b;
+}
+
+.videos .video.private {
+	background-color: #aa84ff;
+}
+
+.videos .video.deleted.private {
+	background-color: #d176a6;
+}

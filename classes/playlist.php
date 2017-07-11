@@ -38,6 +38,7 @@ class Playlist extends Controller {
 				if (!$playlist->dry() && !is_null($playlist->videos)) {
 					$videos = $db->exec("SELECT * FROM videos WHERE id IN ($playlist->videos)");
 					$f3->set('videos', $videos);
+					$f3->set('playlistTitle', $playlist->name);
 				}
 			}
 			else {
@@ -48,7 +49,7 @@ class Playlist extends Controller {
 		}
 		
 		$f3->set('plid', $plid);
-		echo \Template::instance()->render('playlist.htm');
+		echo View::instance()->render('playlist.htm');
 	}
 	
 	//Add a playlist to the user's playlist collection
@@ -205,7 +206,7 @@ class Playlist extends Controller {
 								//add the video to the database and to the user's playlist
 								$videosMapper->reset();
 								$videosMapper->ytid = $ytVideo['snippet']['resourceId']['videoId'];
-								$videosMapper->currentTitle = $ytVideo['snippet']['title'];
+								$videosMapper->currentTitle = str_replace(";", ",", $ytVideo['snippet']['title']);
 								$videosMapper->thumbnails = isset($ytVideo['snippet']['thumbnails']) ? 
 															$ytVideo['snippet']['thumbnails']['high']['url'] : null;
 								$videosMapper->publishedAt = $ytVideo['snippet']['publishedAt'];
