@@ -1,0 +1,26 @@
+<include href="header.htm" />
+
+<div class="container-fluid">
+	
+	<div class="row">
+		<div class="col-xs-1 col-sm-3"></div>
+		<div class="col-xs-10 col-sm-6">
+		
+			<form id="sync" method="post" action="{{ @BASE }}/playlists/{{ @plid }}/sync">
+				<input type="hidden" name="plid" value="{{ @plid }}" />
+				<input type="submit" value="Sync" class="btn btn-default" />
+			</form>
+			
+			<div class="row videos">
+				<repeat group="{{ @videos }}" value="{{ @video }}">
+					<span>{{ @video.currentTitle }}</span>
+				</repeat>
+			</div>
+			
+		</div>
+		<div class="col-xs-1 col-sm-3"></div>
+	</div>
+	
+</div>
+
+<include href="footer.htm" />

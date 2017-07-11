@@ -1,0 +1,39 @@
+<include href="header.htm" />
+
+<div class="container-fluid">
+	
+	<div class="row">
+		<div class="col-xs-1 col-sm-3"></div>
+		<div class="col-xs-10 col-sm-6">
+			
+			<form id="register-form" method="post" action="{{ @BASE }}/playlists">
+				<div class="form-group">
+					<label for="ytid">Playlist ID</label>
+					<input name="ytid" type="text" class="form-control" id="ytid" placeholder="PLgdNnXZT0KZl9ddfpQS_0UvttPDHASsuA">
+				</div>
+				
+				<input type="submit" value="Add Playlist" class="btn btn-default" />
+			</form>
+			
+			<div class="row playlists">
+				<repeat group="{{ @playlists }}" value="{{ @playlist }}">
+					<a href="{{ @BASE .'/playlists/'. @playlist.id}}">
+						<div class="col-xs-1 col-sm-2 col-md-4 col-lg-6 playlist">
+							<div class="thumbnail">
+								<img src="{{ @playlist.thumbnails }}" />
+							</div>
+							<div class="caption">
+								<h4>{{ @playlist.name }}</h4>
+							</div>
+						</div>
+					</a>
+				</repeat>
+			</div>
+			
+		</div>
+		<div class="col-xs-1 col-sm-3"></div>
+	</div>
+	
+</div>
+
+<include href="footer.htm" />
