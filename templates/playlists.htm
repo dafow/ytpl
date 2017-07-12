@@ -17,8 +17,9 @@
 			
 			<div class="row playlists">
 				<repeat group="{{ @playlists }}" value="{{ @playlist }}">
+				<div class="col-xs-12 col-sm-6">
 					<a href="{{ @BASE .'/playlists/'. @playlist.id}}">
-						<div class="col-xs-1 col-sm-2 col-md-4 col-lg-6 playlist">
+						<div class="playlist">
 							<div class="thumbnail">
 								<img src="{{ @playlist.thumbnails }}" />
 							</div>
@@ -27,6 +28,7 @@
 							</div>
 						</div>
 					</a>
+				</div>
 				</repeat>
 			</div>
 			

@@ -21,4 +21,6 @@ $f3->route('GET /playlists/@plid', 'Playlist->show');
 $f3->route('POST /playlists', 'Playlist->addPlaylist');
 $f3->route('POST /playlists/@plid/sync', 'Playlist->sync');
 
+$f3->route('POST /videos/@id/update', 'Video->update');
+
 $f3->run();

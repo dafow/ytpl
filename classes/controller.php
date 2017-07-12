@@ -12,5 +12,20 @@ class Controller {
 		
 		$this->db = $db;
 	}
+	
+	protected function addToCsvUnique($string, $csv) {
+		$str_clean = str_replace(";", ",", $string);
+		if (!isset($string) || empty($string)) {
+			return $csv;
+		}
+		else if (!isset($csv) || empty($csv)) {
+			return $str_clean;
+		}
+		else {
+			$cols = explode(";", $csv);
+			if (!in_array($str_clean, $cols))	return $csv . ";$str_clean";
+			else return $csv;
+		}
+	}
 }
 ?>

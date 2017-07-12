@@ -9,7 +9,7 @@
 			<h2><?= $playlistTitle ?></h2>
 			
 			<form id="sync" method="post" action="<?= $BASE ?>/playlists/<?= $plid ?>/sync">
-				<input type="hidden" name="plid" value="{{ @plid }}" />
+				<input type="hidden" name="plid" value="<?= $plid ?>" />
 				<input type="submit" value="Sync" class="btn btn-default" />
 			</form>
 			
@@ -27,7 +27,29 @@
 							</a>
 						</div>
 						<div class="media-body">
-							<p><?= $video['currentTitle'] ?></p>
+							<p class="title"><?= $video['currentTitle'] ?></p>
+							
+							<?php if (!empty($video['titleHistory']) && $video['titleHistory'] !== $video['currentTitle']): ?>
+								<a class="btn btn-default title-history-show" href="#" role="button">Title History</a>
+								
+								<div class="title-history-form">
+									<p class="legend">Update this video's title to a previous title</p>
+									<ul class="list-group">
+										<?php foreach(explode(";", $video['titleHistory']) as $title): ?>
+											<?php if ($title != $video['currentTitle']): ?>
+												<a href="#" class="list-group-item"><?= $title ?></a>
+											<?php endif; ?>
+										<?php endforeach; ?>
+									</ul>
+									
+									<div class="checkbox">
+										<label><input type="checkbox" />Prevent future syncs to overwrite this video's title</label>
+									</div>
+									<input type="hidden" class="video-id" value="<?= $video['id'] ?>" />
+									<a class="btn btn-success" href="#" role="button">Update</a>
+									<a class="btn btn-warning" href="#" role="button">Cancel</a>
+								</div>
+							<?php endif; ?>
 						</div>
 					</div>
 				<?php endforeach; ?>
@@ -39,4 +61,5 @@
 	
 </div>
 
+<?php Base::instance()->set('jsInclude', array('playlist')); ?>
 <?php echo \Template::instance()->render('footer.htm'); ?>

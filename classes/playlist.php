@@ -177,16 +177,7 @@ class Playlist extends Controller {
 									//compare titles
 									if ($dbVideo['currentTitle'] != $ytVideo['snippet']['title']) {
 										//if they are different, add the name to the video's name history
-										if (!is_null($videosMapper->titleHistory) || empty($videosMapper->titleHistory)) {
-											$videosMapper->titleHistory = $dbVideo['currentTitle'];
-										}
-										else {
-											$titleHistory = explode(";", $videosMapper->titleHistory);
-											//check if the name isn't already in the history
-											if (!in_array(str_replace(";", ",", $ytVideo['snippet']['title']), $titleHistory)) {
-												$videosMapper->titleHistory .= $videosMapper->titleHistory . ";" . $ytVideo['snippet']['title'];
-											}
-										}
+										$videosMapper->titleHistory = $this->addToCsvUnique($ytVideo['snippet']['title'], $videosMapper->titleHistory);
 										
 										if ($videosMapper->forceTitleOverwrite == 1) {
 											$videosMapper->currentTitle = $ytVideo['snippet']['title'];
@@ -207,6 +198,7 @@ class Playlist extends Controller {
 								$videosMapper->reset();
 								$videosMapper->ytid = $ytVideo['snippet']['resourceId']['videoId'];
 								$videosMapper->currentTitle = str_replace(";", ",", $ytVideo['snippet']['title']);
+								$videosMapper->titleHistory = $videosMapper->currentTitle;
 								$videosMapper->thumbnails = isset($ytVideo['snippet']['thumbnails']) ? 
 															$ytVideo['snippet']['thumbnails']['high']['url'] : null;
 								$videosMapper->publishedAt = $ytVideo['snippet']['publishedAt'];
@@ -237,7 +229,7 @@ class Playlist extends Controller {
 			}
 		}
 		
-		$this->index($f3);
+		$this->show($f3, array('plid' => $plid));
 	}
 }
 ?>

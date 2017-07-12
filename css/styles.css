@@ -18,3 +18,7 @@
 .videos .video.deleted.private {
 	background-color: #d176a6;
 }
+
+.title-history-form {
+	display: none;
+}
