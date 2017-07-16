@@ -1,17 +1,35 @@
 <?php echo \Template::instance()->render('header.htm'); ?>
 
-<div class="container-fluid">
+<div class="container-fluid playlist-container">
 	
 	<div class="row">
 		<div class="col-xs-1 col-sm-3"></div>
 		<div class="col-xs-10 col-sm-6">
 		
-			<h2><?= $playlistTitle ?></h2>
+			<div class="header">
+				<a href="<?= $BASE ?>/playlists/<?= $plid ?>"><h2><?= $playlistTitle ?></h2></a>
 			
-			<form id="sync" method="post" action="<?= $BASE ?>/playlists/<?= $plid ?>/sync">
-				<input type="hidden" name="plid" value="<?= $plid ?>" />
-				<input type="submit" value="Sync" class="btn btn-default" />
-			</form>
+				<form id="sync" method="post" action="<?= $BASE ?>/playlists/<?= $plid ?>/sync">
+					<button type="submit" class="btn btn-default btn-md">
+						<span class="glyphicon glyphicon-refresh" aria-hidden="true"></span> Sync
+					</button>
+					
+					<?php if (isset($_GET['order']) && $_GET['order'] == 'ASC'): ?>
+						<a href="<?= $BASE ?>/playlists/<?= $plid ?>?orderBy=publishedAt&order=DESC">
+					<?php else: ?>
+						<a href="<?= $BASE ?>/playlists/<?= $plid ?>?orderBy=publishedAt&order=ASC">
+					<?php endif; ?>
+						<button type="button" class="btn btn-default btn-md">
+							<?php if (isset($_GET['order']) && $_GET['order'] == 'ASC'): ?>
+								<span class="glyphicon glyphicon-sort-by-order" aria-hidden="true"></span> Sort
+							<?php else: ?>
+								<span class="glyphicon glyphicon-sort-by-order-alt" aria-hidden="true"></span> Sort
+							<?php endif; ?>
+						</button>
+					</a>
+					<input type="hidden" name="plid" value="<?= $plid ?>" />
+				</form>
+			</div>
 			
 			<div class="row videos">
 				<?php foreach($videos as $video): ?>
@@ -43,7 +61,8 @@
 									</ul>
 									
 									<div class="checkbox">
-										<label><input type="checkbox" />Prevent future syncs to overwrite this video's title</label>
+										<label><input type="checkbox" <?= $video['forceTitleOverwrite'] == 0 ? "checked" : "" ?>/>
+										Prevent future syncs from overwriting this video's title</label>
 									</div>
 									<input type="hidden" class="video-id" value="<?= $video['id'] ?>" />
 									<a class="btn btn-success" href="#" role="button">Update</a>

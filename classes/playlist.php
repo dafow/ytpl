@@ -36,8 +36,22 @@ class Playlist extends Controller {
 			if (in_array($plid, $userPlaylists)) {
 				$playlist->load(array('id=?', $plid));
 				if (!$playlist->dry() && !is_null($playlist->videos)) {
-					$videos = $db->exec("SELECT * FROM videos WHERE id IN ($playlist->videos)");
+					if (isset($_GET['orderBy']) && isset($_GET['order'])) {
+						if ($_GET['orderBy'] == 'publishedAt') {
+							$videos = $_GET['order'] === 'ASC' ?
+										$db->exec("SELECT * FROM videos WHERE id IN ($playlist->videos) ORDER BY publishedAt ASC") :
+										$db->exec("SELECT * FROM videos WHERE id IN ($playlist->videos) ORDER BY publishedAt DESC");
+						}
+					}
+					else {
+						$videos = $db->exec("SELECT * FROM videos WHERE id IN ($playlist->videos)");
+					}
+					
 					$f3->set('videos', $videos);
+					$f3->set('playlistTitle', $playlist->name);
+				}
+				elseif (!$playlist->dry() && is_null($playlist->videos)) {
+					$f3->set('videos', array());
 					$f3->set('playlistTitle', $playlist->name);
 				}
 			}
@@ -137,88 +151,101 @@ class Playlist extends Controller {
 				$playlistsMapper->load(array('id=?', $plid));
 				
 				if (!$playlistsMapper->dry()) {
-					$dbVideos = is_null($playlistsMapper->videos) ?
-								array() : $db->exec("SELECT * FROM videos WHERE id IN ($playlistsMapper->videos)");
-					
-					//get youtube playlist items
-					require_once dirname(__FILE__) . '/ext/youtubeapi.php';
-					$ytapi = new Youtubeapi($f3);
-					$ytVideos = $ytapi->getPlaylistItems($playlistsMapper->ytid);
-					
-					if (!is_null($ytVideos) && $dbVideos !== false) {
-						//if playlist contains more than maxResults items, get next pages videos
-						$nextPageToken = isset($ytVideos['nextPageToken']) ? $ytVideos['nextPageToken'] : false;
-						while($nextPageToken) {
-							$nextVideos = $ytapi->getPlaylistItems($playlistsMapper->ytid, $nextPageToken);
-							if (!is_null($nextVideos)) {
-								$ytVideos['items'] = array_merge($ytVideos['items'], $nextVideos['items']);
-								$nextPageToken = isset($nextVideos['nextPageToken']) ? $nextVideos['nextPageToken'] : false;
-							}
-							else {
-								$f3->push('flash', (object)array(
-									'lvl'	=>	'warning',
-									'msg'	=>	'Error(s) occurred while synchronizing some of your playlist\'s items'));
-								break;
-							}
-						}
+					//check if last sync was more than 10mins ago
+					if (!(!is_null($playlistsMapper->lastSync) && $playlistsMapper->lastSync > mktime(date('H'), date('i') - 10))
+						|| is_null($playlistsMapper->lastSync)) {
+						$dbVideos = is_null($playlistsMapper->videos) ?
+									array() : $db->exec("SELECT * FROM videos WHERE id IN ($playlistsMapper->videos)");
 						
-						//compare both playlists collections
-						$videosMapper = new DB\SQL\Mapper($db, 'videos');
-						foreach($ytVideos['items'] as $ytVideo) {
-							//find corresponding video in the database
-							$dbVideoKey = array_search($ytVideo['snippet']['resourceId']['videoId'], array_column($dbVideos, 'ytid'));
-							if ($dbVideoKey !== false) {
-								$dbVideo = $dbVideos[$dbVideoKey];
-								
-								$videosMapper->reset();
-								$videosMapper->load(array('id=?', $dbVideo['id']));
-								
-								if (!$videosMapper->dry()) {
-									//compare titles
-									if ($dbVideo['currentTitle'] != $ytVideo['snippet']['title']) {
-										//if they are different, add the name to the video's name history
-										$videosMapper->titleHistory = $this->addToCsvUnique($ytVideo['snippet']['title'], $videosMapper->titleHistory);
-										
-										if ($videosMapper->forceTitleOverwrite == 1) {
-											$videosMapper->currentTitle = $ytVideo['snippet']['title'];
-										}
-									}
-									
-									$videosMapper->status = $ytVideo['status']['privacyStatus'];
-									if (isset($ytVideo['snippet']['thumbnails'])) {
-										$videosMapper->thumbnails = $ytVideo['snippet']['thumbnails']['high']['url'];
-									}
-									
-									$videosMapper->save();
+						//get youtube playlist items
+						require_once dirname(__FILE__) . '/ext/youtubeapi.php';
+						$ytapi = new Youtubeapi($f3);
+						$ytVideos = $ytapi->getPlaylistItems($playlistsMapper->ytid);
+						
+						if (!is_null($ytVideos) && $dbVideos !== false) {
+							//if playlist contains more than maxResults items, get next pages videos
+							$nextPageToken = isset($ytVideos['nextPageToken']) ? $ytVideos['nextPageToken'] : false;
+							while($nextPageToken) {
+								$nextVideos = $ytapi->getPlaylistItems($playlistsMapper->ytid, $nextPageToken);
+								if (!is_null($nextVideos)) {
+									$ytVideos['items'] = array_merge($ytVideos['items'], $nextVideos['items']);
+									$nextPageToken = isset($nextVideos['nextPageToken']) ? $nextVideos['nextPageToken'] : false;
+								}
+								else {
+									$f3->push('flash', (object)array(
+										'lvl'	=>	'warning',
+										'msg'	=>	'Error(s) occurred while synchronizing some of your playlist\'s items'));
+									break;
 								}
 							}
 							
-							else {
-								//add the video to the database and to the user's playlist
-								$videosMapper->reset();
-								$videosMapper->ytid = $ytVideo['snippet']['resourceId']['videoId'];
-								$videosMapper->currentTitle = str_replace(";", ",", $ytVideo['snippet']['title']);
-								$videosMapper->titleHistory = $videosMapper->currentTitle;
-								$videosMapper->thumbnails = isset($ytVideo['snippet']['thumbnails']) ? 
-															$ytVideo['snippet']['thumbnails']['high']['url'] : null;
-								$videosMapper->publishedAt = $ytVideo['snippet']['publishedAt'];
-								$videosMapper->status = $ytVideo['status']['privacyStatus'];
-								$videosMapper->save();
+							//compare both playlists collections
+							$videosMapper = new DB\SQL\Mapper($db, 'videos');
+							foreach($ytVideos['items'] as $ytVideo) {
+								//find corresponding video in the database
+								$dbVideoKey = array_search($ytVideo['snippet']['resourceId']['videoId'], array_column($dbVideos, 'ytid'));
+								if ($dbVideoKey !== false) {
+									$dbVideo = $dbVideos[$dbVideoKey];
+									
+									$videosMapper->reset();
+									$videosMapper->load(array('id=?', $dbVideo['id']));
+									
+									if (!$videosMapper->dry()) {
+										//compare titles
+										if ($dbVideo['currentTitle'] != $ytVideo['snippet']['title']) {
+											//if they are different, add the name to the video's name history
+											$videosMapper->titleHistory = $this->addToCsvUnique($ytVideo['snippet']['title'], $videosMapper->titleHistory);
+											
+											if ($videosMapper->forceTitleOverwrite == 1) {
+												$videosMapper->currentTitle = $ytVideo['snippet']['title'];
+											}
+										}
+										
+										$videosMapper->status = $ytVideo['status']['privacyStatus'];
+										if (isset($ytVideo['snippet']['thumbnails'])) {
+											$videosMapper->thumbnails = $ytVideo['snippet']['thumbnails']['high']['url'];
+										}
+										
+										$videosMapper->save();
+									}
+								}
 								
-								if (is_null($playlistsMapper->videos)) {
-									$playlistsMapper->videos = $videosMapper->id;
-								}
 								else {
-									$playlistsMapper->videos .= "," . $videosMapper->id;
+									//add the video to the database and to the user's playlist
+									$videosMapper->reset();
+									$videosMapper->ytid = $ytVideo['snippet']['resourceId']['videoId'];
+									$videosMapper->currentTitle = str_replace(";", ",", $ytVideo['snippet']['title']);
+									$videosMapper->titleHistory = $videosMapper->currentTitle;
+									$videosMapper->thumbnails = isset($ytVideo['snippet']['thumbnails']) ? 
+																$ytVideo['snippet']['thumbnails']['high']['url'] : null;
+									$videosMapper->publishedAt = $ytVideo['snippet']['publishedAt'];
+									$videosMapper->status = $ytVideo['status']['privacyStatus'];
+									$videosMapper->save();
+									
+									if (is_null($playlistsMapper->videos)) {
+										$playlistsMapper->videos = $videosMapper->id;
+									}
+									else {
+										$playlistsMapper->videos .= "," . $videosMapper->id;
+									}
+									$playlistsMapper->save();
 								}
-								$playlistsMapper->save();
 							}
+							
+							$playlistsMapper->load(array('id=?', $plid));
+							$playlistsMapper->lastSync = date("Y-m-d H:i:s");
+							$playlistsMapper->save();
+						}
+						else {
+							$f3->push('flash', (object)array(
+								'lvl'	=>	'danger',
+								'msg'	=>	'An error occurred while synchronizing your playlist'));
 						}
 					}
 					else {
 						$f3->push('flash', (object)array(
 							'lvl'	=>	'danger',
-							'msg'	=>	'An error occurred while synchronizing your playlist'));
+							'msg'	=>	'Please wait a moment before the next sync'));
 					}
 				}
 				else {
@@ -226,6 +253,11 @@ class Playlist extends Controller {
 						'lvl'	=>	'danger',
 						'msg'	=>	'An error occurred while synchronizing your playlist'));
 				}
+			}
+			else {
+				$f3->push('flash', (object)array(
+					'lvl'	=>	'danger',
+					'msg'	=>	'An error occurred while synchronizing your playlist'));
 			}
 		}
 		

@@ -27,9 +27,14 @@ $(document).ready(function() {
 		
 		let $formContainer = $(e.currentTarget).parent();
 		let $videoContainer = $formContainer.parent();
-		let newTitle = $formContainer.find('.list-group-item.active')[0].textContent;
-		let title = $videoContainer.find('.title')[0];
-		let oldTitle = title.textContent;
+		
+		let $activeTextContainer = $formContainer.find('.list-group-item.active');
+		let newTitle, title, oldTitle;
+		if ($activeTextContainer.length > 0) {
+			newTitle = $formContainer.find('.list-group-item.active')[0].textContent;
+			title = $videoContainer.find('.title')[0];
+			oldTitle = title.textContent;
+		}
 		let owTitle = $formContainer.find('input[type=checkbox]')[0].checked;
 		let videoId = $formContainer.parent().find('.video-id').val();
 		let data = { title: newTitle, owTitle: owTitle, videoId: videoId };
@@ -38,7 +43,7 @@ $(document).ready(function() {
 			if (res) {
 				try {
 					let resjson = JSON.parse(res);
-					if (resjson.title !== undefined) {
+					if (resjson.title !== undefined && $activeTextContainer.length > 0) {
 						title.textContent = data.title;
 						$formContainer.find('.list-group-item').each(function(idx, el) {
 							if (el.textContent == newTitle) {

@@ -1,3 +1,17 @@
+.playlist-container .header {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+}
+
+.playlist-container .header h2 {
+	margin: 0;
+}
+
+.playlist-container .header form {
+	margin-left: 20px;
+}
+
 .videos {
 	margin-top: 20px;
 }
