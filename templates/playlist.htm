@@ -3,8 +3,8 @@
 <div class="container-fluid playlist-container">
 	
 	<div class="row">
-		<div class="col-xs-1 col-sm-3"></div>
-		<div class="col-xs-10 col-sm-6">
+		<div class="col-xs-1 col-sm-2"></div>
+		<div class="col-xs-10 col-sm-8">
 		
 			<div class="header">
 				<a href="<?= $BASE ?>/playlists/<?= $plid ?>"><h2><?= $playlistTitle ?></h2></a>
@@ -14,13 +14,13 @@
 						<span class="glyphicon glyphicon-refresh" aria-hidden="true"></span> Sync
 					</button>
 					
-					<?php if (isset($_GET['order']) && $_GET['order'] == 'ASC'): ?>
-						<a href="<?= $BASE ?>/playlists/<?= $plid ?>?orderBy=publishedAt&order=DESC">
-					<?php else: ?>
+					<?php if (isset($_GET['order']) && $_GET['order'] == 'DESC'): ?>
 						<a href="<?= $BASE ?>/playlists/<?= $plid ?>?orderBy=publishedAt&order=ASC">
+					<?php else: ?>
+						<a href="<?= $BASE ?>/playlists/<?= $plid ?>?orderBy=publishedAt&order=DESC">
 					<?php endif; ?>
 						<button type="button" class="btn btn-default btn-md">
-							<?php if (isset($_GET['order']) && $_GET['order'] == 'ASC'): ?>
+							<?php if (isset($_GET['order']) && $_GET['order'] == 'DESC'): ?>
 								<span class="glyphicon glyphicon-sort-by-order" aria-hidden="true"></span> Sort
 							<?php else: ?>
 								<span class="glyphicon glyphicon-sort-by-order-alt" aria-hidden="true"></span> Sort
@@ -75,7 +75,7 @@
 			</div>
 			
 		</div>
-		<div class="col-xs-1 col-sm-3"></div>
+		<div class="col-xs-1 col-sm-2"></div>
 	</div>
 	
 </div>

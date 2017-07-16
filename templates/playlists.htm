@@ -3,37 +3,76 @@
 <div class="container-fluid">
 	
 	<div class="row">
-		<div class="col-xs-1 col-sm-3"></div>
-		<div class="col-xs-10 col-sm-6">
+		<div class="col-xs-1 col-sm-2"></div>
+		<div class="col-xs-10 col-sm-8">
 			
-			<form id="register-form" method="post" action="{{ @BASE }}/playlists">
-				<div class="form-group">
-					<label for="ytid">Playlist ID</label>
-					<input name="ytid" type="text" class="form-control" id="ytid" placeholder="PLgdNnXZT0KZl9ddfpQS_0UvttPDHASsuA">
+			<div class="well">
+				<form id="register-form" method="post" action="{{ @BASE }}/playlists">
+					<div class="form-group">
+						<label for="ytid">Playlist ID</label>
+						<input name="ytid" type="text" class="form-control" id="ytid" placeholder="PLgdNnXZT0KZl9ddfpQS_0UvttPDHASsuA">
+					</div>
+					
+					<input type="submit" value="Add Playlist" class="btn btn-default" />
+				</form>
+			</div>
+			
+			<div class="row">
+				<div class="col-xs-12">
+					<check if="{{ isset(@GET.mode) && @GET.mode == 'thumbs' }}">
+						<true>
+							<a href="{{ @BASE }}/playlists">
+								<button type="button" class="btn btn-default" aria-label="Display as thumbnails">
+									<span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>
+								</button>
+							</a>
+						</true>
+						<false>
+							<a href="{{ @BASE }}/playlists?mode=thumbs">
+								<button type="button" class="btn btn-default" aria-label="Display as thumbnails">
+									<span class="glyphicon glyphicon-th" aria-hidden="true"></span>
+								</button>
+							</a>
+						</false>
+					</check>
 				</div>
-				
-				<input type="submit" value="Add Playlist" class="btn btn-default" />
-			</form>
+			</div>
 			
-			<div class="row playlists">
-				<repeat group="{{ @playlists }}" value="{{ @playlist }}">
-				<div class="col-xs-12 col-sm-6">
-					<a href="{{ @BASE .'/playlists/'. @playlist.id}}">
-						<div class="playlist">
-							<div class="thumbnail">
-								<img src="{{ @playlist.thumbnails }}" />
+			<check if="{{ isset(@GET.mode) && @GET.mode == 'thumbs' }}">
+				<true>
+					<div class="row playlists thumbs">
+						<repeat group="{{ @playlists }}" value="{{ @playlist }}">
+							<div class="col-xs-12 col-sm-6">
+								<a href="{{ @BASE .'/playlists/'. @playlist.id}}">
+									<div class="playlist">
+										<div class="thumbnail">
+											<img src="{{ @playlist.thumbnails }}" />
+										</div>
+										<div class="caption">
+											<h4>{{ @playlist.name }}</h4>
+										</div>
+									</div>
+								</a>
 							</div>
-							<div class="caption">
-								<h4>{{ @playlist.name }}</h4>
+						</repeat>
+					</div>
+				</true>
+				<false>
+					<div class="row playlists list">
+						<div class="col-xs-12">
+							<div class="list-group">
+								<repeat group="{{ @playlists }}" value="{{ @playlist }}">
+									<a href="{{ @BASE .'/playlists/'. @playlist.id}}" class="list-group-item">{{ @playlist.name }}</a>
+								</repeat>
 							</div>
 						</div>
-					</a>
-				</div>
-				</repeat>
+					</div>
+				</false>
+			</check>
 			</div>
 			
 		</div>
-		<div class="col-xs-1 col-sm-3"></div>
+		<div class="col-xs-1 col-sm-2"></div>
 	</div>
 	
 </div>
