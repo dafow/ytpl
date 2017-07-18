@@ -2,7 +2,7 @@
 class Playlist extends Controller {
 
 	//Show a collection of user playlists
-	function index($f3) {
+	function index($f3, $params) {
 		$db = $this->db;
 		$user = new DB\SQL\Mapper($db, 'users');
 		$user->load(array('id=?', $f3->get('SESSION.uid')));
@@ -14,8 +14,21 @@ class Playlist extends Controller {
 		}
 		else {
 			if (!is_null($user->playlists)) {
-				$playlists = $db->exec("SELECT * FROM playlists WHERE id IN ($user->playlists)");
-				$f3->set('playlists', $playlists);
+				$playlistsMapper = new DB\SQL\Mapper($db, 'playlists');
+				$limit = isset($_GET['mode']) ? 5 : 10;
+				$page = isset($params['page']) ? $params['page'] - 1 : 0;
+				$playlists = $playlistsMapper->paginate($page, $limit, "id IN ($user->playlists)");
+				if (!is_null($playlists['pos'])) {
+					$f3->set('currentPage', $playlists['pos']);
+					$f3->set('pagesCount', $playlists['count']);
+					$f3->set('playlists', $playlists['subset']);
+				}
+				else {
+					$f3->push('warning', (object)array(
+						'lvl'	=>	'warning',
+						'msg'	=>	'Not much to see...'));
+					$f3->set('playlists', array());
+				}
 			}
 		}
 		

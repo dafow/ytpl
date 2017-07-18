@@ -4,8 +4,8 @@
 	
 	<div class="row">
 		<div class="col-xs-1 col-sm-2"></div>
+		
 		<div class="col-xs-10 col-sm-8">
-			
 			<div class="well">
 				<form id="register-form" method="post" action="{{ @BASE }}/playlists">
 					<div class="form-group">
@@ -21,14 +21,14 @@
 				<div class="col-xs-12">
 					<check if="{{ isset(@GET.mode) && @GET.mode == 'thumbs' }}">
 						<true>
-							<a href="{{ @BASE }}/playlists">
-								<button type="button" class="btn btn-default" aria-label="Display as thumbnails">
+							<a href="{{ @BASE }}/playlists{{ isset(@currentPage) ? '/page/'.(@currentPage + 1) : '' }}">
+								<button type="button" class="btn btn-default" aria-label="Display as a simple list">
 									<span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>
 								</button>
 							</a>
 						</true>
 						<false>
-							<a href="{{ @BASE }}/playlists?mode=thumbs">
+							<a href="{{ @BASE }}/playlists{{ isset(@currentPage) ? '/page/'.(@currentPage + 1) : '' }}?mode=thumbs">
 								<button type="button" class="btn btn-default" aria-label="Display as thumbnails">
 									<span class="glyphicon glyphicon-th" aria-hidden="true"></span>
 								</button>
@@ -42,7 +42,7 @@
 				<true>
 					<div class="row playlists thumbs">
 						<repeat group="{{ @playlists }}" value="{{ @playlist }}">
-							<div class="col-xs-12 col-sm-6">
+							<div class="col-xs-12 col-sm-4 col-md-3">
 								<a href="{{ @BASE .'/playlists/'. @playlist.id}}">
 									<div class="playlist">
 										<div class="thumbnail">
@@ -69,9 +69,23 @@
 					</div>
 				</false>
 			</check>
-			</div>
 			
+			<check if="{{ isset(@pagesCount) }}">
+				<true>
+					<nav aria-label="Page navigation">
+						<ul class="pager">
+							<check if="{{ @currentPage > 0 }}">
+								<li><a href="{{ @BASE }}/playlists/page/{{ @currentPage }}{{ isset(@GET.mode) ? '?mode=thumbs' : '' }}">Previous</a></li>
+							</check>
+							<check if="{{ @currentPage + 1 < @pagesCount && count(@playlists) > 0 }}">
+								<li><a href="{{ @BASE }}/playlists/page/{{ @currentPage + 2 }}{{ isset(@GET.mode) ? '?mode=thumbs' : '' }}">Next</a></li>
+							</check>
+						</ul>
+					</nav>
+				</true>
+			</check>
 		</div>
+			
 		<div class="col-xs-1 col-sm-2"></div>
 	</div>
 	
