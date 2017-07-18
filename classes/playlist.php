@@ -152,7 +152,7 @@ class Playlist extends Controller {
 				
 				if (!$playlistsMapper->dry()) {
 					//check if last sync was more than 10mins ago
-					if (!(!is_null($playlistsMapper->lastSync) && $playlistsMapper->lastSync > mktime(date('H'), date('i') - 10))
+					if (!(!is_null($playlistsMapper->lastSync) && $playlistsMapper->lastSync > date('Y-m-d H:i:s', mktime(date('H'), date('i') - 5)))
 						|| is_null($playlistsMapper->lastSync)) {
 						$dbVideos = is_null($playlistsMapper->videos) ?
 									array() : $db->exec("SELECT * FROM videos WHERE id IN ($playlistsMapper->videos)");
@@ -235,6 +235,10 @@ class Playlist extends Controller {
 							$playlistsMapper->load(array('id=?', $plid));
 							$playlistsMapper->lastSync = date("Y-m-d H:i:s");
 							$playlistsMapper->save();
+							
+							$f3->push('flash', (object)array(
+								'lvl'	=>	'success',
+								'msg'	=>	'Sync complete'));
 						}
 						else {
 							$f3->push('flash', (object)array(
@@ -245,7 +249,7 @@ class Playlist extends Controller {
 					else {
 						$f3->push('flash', (object)array(
 							'lvl'	=>	'danger',
-							'msg'	=>	'Please wait a moment before the next sync'));
+							'msg'	=>	'In order to void excessive bandwidth usage, please wait at least 5 minutes before syncing again'));
 					}
 				}
 				else {
