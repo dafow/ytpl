@@ -23,6 +23,27 @@
 .videos .video {
 	padding: 20px;
 	background-color: #f5f5f5;
+	-webkit-border-radius: 10px;
+	-moz-border-radius: 10px;
+	border-radius: 10px;
+}
+
+.videos .video .media-body a {
+	color: black;
+	text-decoration: none;
+
+}
+
+.videos .video .media-body .title-history-show {
+	margin-left: 10px;
+}
+
+.videos .video .media-body a .glyphicon {
+	display: none;
+}
+
+.videos .video .media-body a:hover .glyphicon {
+	display: inline;
 }
 
 .videos .video.deleted {
@@ -39,4 +60,15 @@
 
 .title-history-form {
 	display: none;
+	padding: 20px;
+	background-color: white;
+	margin-top: 10px;
+	-webkit-border-radius: 10px;
+	-moz-border-radius: 10px;
+	border-radius: 10px;
+}
+
+.videos .video .media-body .title-history-form .list-group-item.active,
+.videos .video .media-body .title-history-form .btn {
+	color: white;
 }

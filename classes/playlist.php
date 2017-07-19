@@ -261,7 +261,7 @@ class Playlist extends Controller {
 						else {
 							$f3->push('flash', (object)array(
 								'lvl'	=>	'danger',
-								'msg'	=>	'An error occurred while synchronizing your playlist'));
+								'msg'	=>	'An error occurred while synchronizing your playlist (make sure it\'s public)'));
 						}
 					}
 					else {
