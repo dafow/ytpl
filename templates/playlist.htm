@@ -14,17 +14,14 @@
 						<span class="glyphicon glyphicon-refresh" aria-hidden="true"></span> Sync
 					</button>
 					
-					<?php if (isset($_GET['order']) && $_GET['order'] == 'DESC'): ?>
-						<a href="<?= $BASE ?>/playlists/<?= $plid ?>?orderBy=publishedAt&order=ASC">
-					<?php else: ?>
-						<a href="<?= $BASE ?>/playlists/<?= $plid ?>?orderBy=publishedAt&order=DESC">
-					<?php endif; ?>
+					<?php
+						$sort_url = "$BASE/playlists/$plid/".($currentPage > 0 ? 'page/'.($currentPage+1) : 'page/1')."/?orderBy=publishedAt&order=";
+						$sort_url .= (isset($_GET['order']) && $_GET['order'] == 'DESC') ? 'ASC' : 'DESC';
+					?>
+					<a href="<?= $sort_url ?>">
 						<button type="button" class="btn btn-default btn-md">
-							<?php if (isset($_GET['order']) && $_GET['order'] == 'DESC'): ?>
-								<span class="glyphicon glyphicon-sort-by-order" aria-hidden="true"></span> Sort
-							<?php else: ?>
-								<span class="glyphicon glyphicon-sort-by-order-alt" aria-hidden="true"></span> Sort
-							<?php endif; ?>
+							<span class="glyphicon glyphicon-sort-by-order<?= (isset($_GET['order']) && $_GET['order'] == 'DESC') ? "":"-alt" ?>"aria-hidden="true">
+							</span> Sort
 						</button>
 					</a>
 					<input type="hidden" name="plid" value="<?= $plid ?>" />
@@ -41,11 +38,13 @@
 					<div class="media video<?= $videoClasses ?>">
 						<div class="media-left media-middle">
 							<a href="https://www.youtube.com/watch?v=<?= $video['ytid'] ?>" target="_blank">
-								<img class="media-object" style="width: 64px; height: 64px;" src="<?= $video['thumbnails'] ?>">
+								<img class="media-object" style="height: 64px;" src="<?= $video['thumbnails'] ?>">
 							</a>
 						</div>
 						<div class="media-body">
-							<p class="title"><?= $video['currentTitle'] ?></p>
+							<a href="https://www.youtube.com/watch?v=<?= $video['ytid'] ?>" target="_blank">
+								<p class="title"><?= $video['currentTitle'] ?></p>
+							</a>
 							
 							<?php if (!empty($video['titleHistory']) && $video['titleHistory'] !== $video['currentTitle']): ?>
 								<a class="btn btn-default title-history-show" href="#" role="button">Title History</a>
@@ -73,6 +72,26 @@
 					</div>
 				<?php endforeach; ?>
 			</div>
+			
+			<?php if (isset($pagesCount)): ?>
+				<nav aria-label="Page navigation">
+					<ul class="pager">
+						<?php
+							$base_el = "<li><a href=\"$BASE/playlists/$plid/page/";
+							if ($currentPage > 0) {	
+								echo $base_el . $currentPage;
+								echo "?orderBy=publishedAt&order=" . ((isset($_GET['order']) && $_GET['order'] == 'DESC') ? 'DESC' : 'ASC');
+								echo '">Previous</a></li>';
+							}
+							if ($currentPage + 1 < $pagesCount && count($videos) > 0) {
+								echo $base_el . ($currentPage + 2);
+								echo "?orderBy=publishedAt&order=" . ((isset($_GET['order']) && $_GET['order'] == 'DESC') ? 'DESC' : 'ASC');
+								echo '">Next</a></li>';
+							}
+						?>
+					</ul>
+				</nav>
+			<?php endif; ?>
 			
 		</div>
 		<div class="col-xs-1 col-sm-2"></div>

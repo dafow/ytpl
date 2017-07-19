@@ -49,18 +49,23 @@ class Playlist extends Controller {
 			if (in_array($plid, $userPlaylists)) {
 				$playlist->load(array('id=?', $plid));
 				if (!$playlist->dry() && !is_null($playlist->videos)) {
+					$videosMapper = new DB\SQL\Mapper($db, 'videos');
+					$limit = isset($_GET['mode']) ? 5 : 10;
+					$page = isset($params['page']) ? $params['page'] - 1 : 0;
 					if (isset($_GET['orderBy']) && isset($_GET['order'])) {
 						if ($_GET['orderBy'] == 'publishedAt') {
-							$videos = $_GET['order'] === 'ASC' ?
-										$db->exec("SELECT * FROM videos WHERE id IN ($playlist->videos) ORDER BY publishedAt ASC") :
-										$db->exec("SELECT * FROM videos WHERE id IN ($playlist->videos) ORDER BY publishedAt DESC");
+							$order = $_GET['order'] === 'ASC' ? 'ASC' : 'DESC';
+							$options = array('order' => 'publishedAt '.$order);
+							$videos = $videosMapper->paginate($page, $limit, "id IN ($playlist->videos)", $options);
 						}
 					}
 					else {
-						$videos = $db->exec("SELECT * FROM videos WHERE id IN ($playlist->videos)");
+						$videos = $videosMapper->paginate($page, $limit, "id IN ($playlist->videos)");
 					}
 					
-					$f3->set('videos', $videos);
+					$f3->set('videos', $videos['subset']);
+					$f3->set('currentPage', $videos['pos']);
+					$f3->set('pagesCount', $videos['count']);
 					$f3->set('playlistTitle', $playlist->name);
 				}
 				elseif (!$playlist->dry() && is_null($playlist->videos)) {
@@ -164,7 +169,7 @@ class Playlist extends Controller {
 				$playlistsMapper->load(array('id=?', $plid));
 				
 				if (!$playlistsMapper->dry()) {
-					//check if last sync was more than 10mins ago
+					//check if last sync was more than 5mins ago
 					if (!(!is_null($playlistsMapper->lastSync) && $playlistsMapper->lastSync > date('Y-m-d H:i:s', mktime(date('H'), date('i') - 5)))
 						|| is_null($playlistsMapper->lastSync)) {
 						$dbVideos = is_null($playlistsMapper->videos) ?

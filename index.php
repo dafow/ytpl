@@ -19,6 +19,7 @@ $f3->route('GET /logout', 'User->logout');
 $f3->route('GET /playlists', 'Playlist->index');
 $f3->route('GET /playlists/page/@page', 'Playlist->index');
 $f3->route('GET /playlists/@plid', 'Playlist->show');
+$f3->route('GET /playlists/@plid/page/@page', 'Playlist->show');
 $f3->route('POST /playlists', 'Playlist->addPlaylist');
 $f3->route('POST /playlists/@plid/sync', 'Playlist->sync');
 
