@@ -1,6 +1,12 @@
 <?php
 class Playlist extends Controller {
 
+	function beforeRoute($f3) {
+		if (!$f3->exists('SESSION.uid')) {
+			$f3->reroute('/login', false);
+		}
+	}
+
 	//Show a collection of user playlists
 	function index($f3, $params) {
 		$db = $this->db;
@@ -13,7 +19,7 @@ class Playlist extends Controller {
 				'msg'	=>	'An error occurred while retrieving your playlists'));
 		}
 		else {
-			if (!is_null($user->playlists)) {
+			if (!is_null($user->playlists) && !empty($user->playlists)) {
 				$playlistsMapper = new DB\SQL\Mapper($db, 'playlists');
 				$limit = isset($_GET['mode']) ? 5 : 10;
 				$page = isset($params['page']) ? $params['page'] - 1 : 0;
@@ -142,7 +148,7 @@ class Playlist extends Controller {
 			}
 		}
 		
-		$this->index($f3);
+		$this->index($f3, array('page' => 1));
 	}
 	
 	//Sync current playlist with Youtube's

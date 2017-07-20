@@ -4,11 +4,9 @@ $f3 = require('lib/base.php');
 // Load configuration
 $f3->config('config.ini');
 
-$f3->route('GET /',
-    function($f3) {
-        echo \Template::instance()->render('home.htm');
-    }
-);
+$f3->route('GET /', function($f3) {
+	echo \Template::instance()->render('home.htm');
+});
 
 $f3->route('GET /login', 'User->login');
 $f3->route('POST /login', 'User->auth');
@@ -24,5 +22,11 @@ $f3->route('POST /playlists', 'Playlist->addPlaylist');
 $f3->route('POST /playlists/@plid/sync', 'Playlist->sync');
 
 $f3->route('POST /videos/@id/update', 'Video->update');
+
+$f3->set('ONERROR', function($f3){
+	$logger = new \Log('f3errors.log');
+	$logger->write(print_r($f3->get('ERROR'), true));
+	echo \Template::instance()->render('error.htm');
+});
 
 $f3->run();
