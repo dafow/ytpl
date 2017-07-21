@@ -22,6 +22,7 @@ $f3->route('POST /playlists', 'Playlist->addPlaylist');
 $f3->route('POST /playlists/@plid/sync', 'Playlist->sync');
 
 $f3->route('POST /videos/@id/update', 'Video->update');
+$f3->route('POST /videos/@id/delete', 'Video->delete');
 
 $f3->set('ONERROR', function($f3){
 	$logger = new \Log('f3errors.log');

@@ -23,7 +23,7 @@
       <x>830</x>
       <y>130</y>
       <w>290</w>
-      <h>130</h>
+      <h>150</h>
     </coordinates>
     <panel_attributes>Playlists
 --
@@ -32,7 +32,8 @@
 -name: string
 -videos: string (csv of videos ids)
 -thumbnails: string
--status: string</panel_attributes>
+-status: string
+-lastSync: datetime</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
@@ -50,9 +51,9 @@
     <id>UMLClass</id>
     <coordinates>
       <x>850</x>
-      <y>300</y>
+      <y>340</y>
       <w>260</w>
-      <h>120</h>
+      <h>160</h>
     </coordinates>
     <panel_attributes>Videos
 --
@@ -60,18 +61,21 @@
 -ytid: string
 -titleHistory: string (long)
 -currentTitle: string
--thumbnails: string</panel_attributes>
+-forceTitleOverwrite: bool
+-thumbnails: string
+-publishedAt: datetime
+-status: string</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
       <x>960</x>
-      <y>250</y>
+      <y>270</y>
       <w>30</w>
-      <h>70</h>
+      <h>90</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;&lt;&lt;-</panel_attributes>
-    <additional_attributes>10.0;50.0;10.0;10.0</additional_attributes>
+    <additional_attributes>10.0;70.0;10.0;10.0</additional_attributes>
   </element>
 </diagram>

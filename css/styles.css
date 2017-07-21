@@ -31,11 +31,15 @@
 .videos .video .media-body a {
 	color: black;
 	text-decoration: none;
+}
 
+.videos .video .media-body .actions {
+	display: flex;
+	margin-top: 10px;
 }
 
 .videos .video .media-body .title-history-show {
-	margin-left: 10px;
+	margin-right: 10px;
 }
 
 .videos .video .media-body a .glyphicon {
@@ -71,4 +75,32 @@
 .videos .video .media-body .title-history-form .list-group-item.active,
 .videos .video .media-body .title-history-form .btn {
 	color: white;
+}
+
+.home .ps {
+	display: flex;
+	flex-wrap: nowrap;
+}
+
+.home .ps img {
+	max-height: 70vh;
+}
+
+.home .ps .content {
+	padding-left: 2vw;
+}
+
+.home h1{
+	color: #f5511e;
+	font-weight: bold;
+}
+
+@media (max-width: 545px) {
+	.home .ps {
+		flex-wrap: wrap;
+	}
+	
+	.home .content {
+		margin-top: 15px;
+	}
 }

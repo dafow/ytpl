@@ -47,28 +47,38 @@
 								<span class="glyphicon glyphicon-play-circle" aria-hidden="true"></span>
 							</a>
 							
-							<?php if (!empty($video['titleHistory']) && $video['titleHistory'] !== $video['currentTitle']): ?>
-								<a class="btn btn-default title-history-show" href="#" role="button">Title History</a>
-								
-								<div class="title-history-form">
-									<p class="legend">Update this video's title to a previous title</p>
-									<ul class="list-group">
-										<?php foreach(explode(";", $video['titleHistory']) as $title): ?>
-											<?php if ($title != $video['currentTitle']): ?>
-												<a href="#" class="list-group-item"><?= $title ?></a>
-											<?php endif; ?>
-										<?php endforeach; ?>
-									</ul>
-									
-									<div class="checkbox">
-										<label><input type="checkbox" <?= $video['forceTitleOverwrite'] == 0 ? "checked" : "" ?>/>
-										Prevent future syncs from overwriting this video's title</label>
+							<div class="actions">
+								<?php if (!empty($video['titleHistory']) && $video['titleHistory'] !== $video['currentTitle']): ?>
+									<div class="title-history">
+										<a class="btn btn-default title-history-show" href="#" role="button">Title History</a>
+										
+										<div class="title-history-form">
+											<p class="legend">Update this video's title to a previous title</p>
+											<ul class="list-group">
+												<?php foreach(explode(";", $video['titleHistory']) as $title): ?>
+													<?php if ($title != $video['currentTitle']): ?>
+														<a href="#" class="list-group-item"><?= $title ?></a>
+													<?php endif; ?>
+												<?php endforeach; ?>
+											</ul>
+											
+											<div class="checkbox">
+												<label><input type="checkbox" <?= $video['forceTitleOverwrite'] == 0 ? "checked" : "" ?>/>
+												Prevent future syncs from overwriting this video's title</label>
+											</div>
+											<input type="hidden" class="video-id" value="<?= $video['id'] ?>" />
+											<a class="btn btn-success" href="#" role="button">Update</a>
+											<a class="btn btn-warning" href="#" role="button">Cancel</a>
+										</div>
 									</div>
-									<input type="hidden" class="video-id" value="<?= $video['id'] ?>" />
-									<a class="btn btn-success" href="#" role="button">Update</a>
-									<a class="btn btn-warning" href="#" role="button">Cancel</a>
+								<?php endif; ?>
+								
+								<div class="delete-video">
+									<button type="button" class="btn btn-danger btn-md" data-plid="<?= $plid ?>" data-vid="<?= $video['id'] ?>">
+										<span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Delete Video
+									</button>
 								</div>
-							<?php endif; ?>
+							</div>
 						</div>
 					</div>
 				<?php endforeach; ?>

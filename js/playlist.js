@@ -26,7 +26,7 @@ $(document).ready(function() {
 		e.preventDefault();
 		
 		let $formContainer = $(e.currentTarget).parent();
-		let $videoContainer = $formContainer.parent();
+		let $videoContainer = $formContainer.parent().parent().parent();
 		
 		let $activeTextContainer = $formContainer.find('.list-group-item.active');
 		let newTitle, title, oldTitle;
@@ -60,5 +60,21 @@ $(document).ready(function() {
 				}
 			}
 		});
+	});
+	
+	//AJAX request to delete video
+	$('.videos .delete-video .btn').click(function(e) {
+		e.preventDefault();
+		
+		if (confirm("Removing this video will delete from your YTPL playlist only. It will be added again next sync if it's still in your Youtube playlist") === true) {
+			let vid = e.currentTarget.getAttribute('data-vid');
+			let data = { plid: e.currentTarget.getAttribute('data-plid') };
+			
+			$.post(window.F3.baseUrl + '/videos/'+vid+'/delete', data, function(res) {
+				if (res) {
+					console.log(res);
+				}
+			});
+		}
 	});
 });
