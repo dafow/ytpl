@@ -21,7 +21,7 @@ class Playlist extends Controller {
 		else {
 			if (!is_null($user->playlists) && !empty($user->playlists)) {
 				$playlistsMapper = new DB\SQL\Mapper($db, 'playlists');
-				$limit = isset($_GET['mode']) ? 5 : 10;
+				$limit = isset($_GET['mode']) ? 10 : 5;
 				$page = isset($params['page']) ? $params['page'] - 1 : 0;
 				$playlists = $playlistsMapper->paginate($page, $limit, "id IN ($user->playlists)");
 				if (!is_null($playlists['pos'])) {
@@ -56,7 +56,7 @@ class Playlist extends Controller {
 				$playlist->load(array('id=?', $plid));
 				if (!$playlist->dry() && !is_null($playlist->videos)) {
 					$videosMapper = new DB\SQL\Mapper($db, 'videos');
-					$limit = isset($_GET['mode']) ? 5 : 10;
+					$limit = isset($_GET['mode']) ? 10 : 5;
 					$page = isset($params['page']) ? $params['page'] - 1 : 0;
 					if (isset($_GET['orderBy']) && isset($_GET['order'])) {
 						if ($_GET['orderBy'] == 'publishedAt') {

@@ -19,18 +19,18 @@
 			
 			<div class="row">
 				<div class="col-xs-12">
-					<check if="{{ isset(@GET.mode) && @GET.mode == 'thumbs' }}">
+					<check if="{{ isset(@GET.mode) && @GET.mode == 'list' }}">
 						<true>
 							<a href="{{ @BASE }}/playlists{{ isset(@currentPage) ? '/page/'.(@currentPage + 1) : '' }}">
-								<button type="button" class="btn btn-default" aria-label="Display as a simple list">
-									<span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>
+								<button type="button" class="btn btn-default" aria-label="Display as thumbnails">
+									<span class="glyphicon glyphicon-th" aria-hidden="true"></span>
 								</button>
 							</a>
 						</true>
 						<false>
-							<a href="{{ @BASE }}/playlists{{ isset(@currentPage) ? '/page/'.(@currentPage + 1) : '' }}?mode=thumbs">
-								<button type="button" class="btn btn-default" aria-label="Display as thumbnails">
-									<span class="glyphicon glyphicon-th" aria-hidden="true"></span>
+							<a href="{{ @BASE }}/playlists{{ isset(@currentPage) ? '/page/'.(@currentPage + 1) : '' }}?mode=list">
+								<button type="button" class="btn btn-default" aria-label="Display as a simple list">
+									<span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>
 								</button>
 							</a>
 						</false>
@@ -38,8 +38,19 @@
 				</div>
 			</div>
 			
-			<check if="{{ isset(@GET.mode) && @GET.mode == 'thumbs' }}">
+			<check if="{{ isset(@GET.mode) && @GET.mode == 'list' }}">
 				<true>
+					<div class="row playlists list">
+						<div class="col-xs-12">
+							<div class="list-group">
+								<repeat group="{{ @playlists }}" value="{{ @playlist }}">
+									<a href="{{ @BASE .'/playlists/'. @playlist.id}}" class="list-group-item">{{ @playlist.name }}</a>
+								</repeat>
+							</div>
+						</div>
+					</div>
+				</true>
+				<false>
 					<div class="row playlists thumbs">
 						<repeat group="{{ @playlists }}" value="{{ @playlist }}">
 							<div class="col-xs-12 col-sm-4 col-md-3">
@@ -55,17 +66,6 @@
 								</a>
 							</div>
 						</repeat>
-					</div>
-				</true>
-				<false>
-					<div class="row playlists list">
-						<div class="col-xs-12">
-							<div class="list-group">
-								<repeat group="{{ @playlists }}" value="{{ @playlist }}">
-									<a href="{{ @BASE .'/playlists/'. @playlist.id}}" class="list-group-item">{{ @playlist.name }}</a>
-								</repeat>
-							</div>
-						</div>
 					</div>
 				</false>
 			</check>
