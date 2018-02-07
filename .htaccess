@@ -14,7 +14,7 @@ RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule .* index.php [L,QSA]
 
-<Files ~ "^.*\.(LOG|log)">
+<Files ~ "^.*\.(LOG|log|ini)">
 	Order allow,deny
 	Deny from all
 </Files>
