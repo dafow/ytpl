@@ -16,7 +16,10 @@
 					
 					<?php
 						$sort_url = "$BASE/playlists/$plid/".($currentPage > 0 ? 'page/'.($currentPage+1) : 'page/1')."/?orderBy=publishedAt&order=";
-						$sort_url .= (isset($_GET['order']) && $_GET['order'] == 'DESC') ? 'ASC' : 'DESC';
+						$order = isset($_GET['order']) ?
+							($_GET['order'] === 'DESC' ? 'ASC' : 'DESC') :
+							'ASC';
+						$sort_url .= $order;
 					?>
 					<a href="<?= $sort_url ?>">
 						<button type="button" class="btn btn-default btn-md">

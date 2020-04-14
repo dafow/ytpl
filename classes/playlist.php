@@ -56,18 +56,11 @@ class Playlist extends Controller {
 				$playlist->load(array('id=?', $plid));
 				if (!$playlist->dry() && !is_null($playlist->videos)) {
 					$videosMapper = new DB\SQL\Mapper($db, 'videos');
-					$limit = isset($_GET['mode']) ? 10 : 5;
+					$limit = 25;
 					$page = isset($params['page']) ? $params['page'] - 1 : 0;
-					if (isset($_GET['orderBy']) && isset($_GET['order'])) {
-						if ($_GET['orderBy'] == 'publishedAt') {
-							$order = $_GET['order'] === 'ASC' ? 'ASC' : 'DESC';
-							$options = array('order' => 'publishedAt '.$order);
-							$videos = $videosMapper->paginate($page, $limit, "id IN ($playlist->videos)", $options);
-						}
-					}
-					else {
-						$videos = $videosMapper->paginate($page, $limit, "id IN ($playlist->videos)");
-					}
+					$order = isset($_GET['order']) && $_GET['order'] === 'ASC' ? 'ASC' : 'DESC';
+					$options = array('order' => 'publishedAt ' . $order);
+					$videos = $videosMapper->paginate($page, $limit, "id IN ($playlist->videos)", $options);
 					
 					$f3->set('videos', $videos['subset']);
 					$f3->set('currentPage', $videos['pos']);
@@ -175,8 +168,11 @@ class Playlist extends Controller {
 				$playlistsMapper->load(array('id=?', $plid));
 				
 				if (!$playlistsMapper->dry()) {
+					$lastSync = $playlistsMapper->lastSync !== null ? 
+						DateTime::createFromFormat('Y-m-d H:i:s', $playlistsMapper->lastSync) :
+						null;
 					//check if last sync was more than 5mins ago
-					if (!(!is_null($playlistsMapper->lastSync) && $playlistsMapper->lastSync > date('Y-m-d H:i:s', mktime(date('H'), date('i') - 5)))
+					if (!(!is_null($lastSync) && (new DateTime())->getTimeStamp() - $lastSync->getTimeStamp() < 5 * 60)
 						|| is_null($playlistsMapper->lastSync)) {
 						$dbVideos = is_null($playlistsMapper->videos) ?
 									array() : $db->exec("SELECT * FROM videos WHERE id IN ($playlistsMapper->videos)");
