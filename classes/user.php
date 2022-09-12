@@ -5,8 +5,9 @@ class User extends Controller {
 	function login($f3) {
 		if (!$f3->exists('SESSION.uid')) {
 			$img = new Image;
+        	$fontPath = str_replace("\\", "/", $f3->get("ROOT")) . '/fonts/';
 			$f3->set('captcha',$f3->base64(
-				$img->captcha('fonts/eufoniem.ttf',18,5,'SESSION.captcha')->dump(),'image/png'));
+				$img->captcha('eufoniem.ttf',18,5,'SESSION.captcha', $fontPath)->dump(),'image/png'));
 			echo \Template::instance()->render('login.htm');
 		}
 		else {
