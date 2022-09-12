@@ -11,6 +11,14 @@
 		<link href="{{@BASE}}/css/bootstrap.min.css" rel="stylesheet">
 		<link href="{{@BASE}}/css/styles.css" rel="stylesheet">
 
+		<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+		<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+		<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+		<link rel="manifest" href="/site.webmanifest">
+		<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+		<meta name="msapplication-TileColor" content="#da532c">
+		<meta name="theme-color" content="#ffffff">
+
 		<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
 		<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
 		<!--[if lt IE 9]>
@@ -19,7 +27,7 @@
 		<![endif]-->
 		
 		<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-		<script>window.F3 = { baseUrl: '{{ @BASE }}' };</script
+		<script>window.F3 = { baseUrl: '{{ @BASE }}' };</script>
 	</head>
 	
 	<body>
@@ -53,7 +61,7 @@
 		<div class="col-xs-1 col-sm-3"></div>
 		<div class="col-xs-10 col-sm-6">
 			<repeat group="{{ @flash }}" value="{{ @fl }}">
-				<div class="alert alert-{{ @fl->lvl}}" role="alert">{{ @fl->msg }}</div>
+				<div class="alert alert-{{ @fl->lvl }}" role="alert">{{ @fl->msg }}</div>
 			</repeat>
 		</div>
 		<div class="col-xs-1 col-sm-3"></div>
