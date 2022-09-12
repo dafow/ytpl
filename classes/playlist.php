@@ -171,9 +171,9 @@ class Playlist extends Controller {
 					$lastSync = $playlistsMapper->lastSync !== null ? 
 						DateTime::createFromFormat('Y-m-d H:i:s', $playlistsMapper->lastSync) :
 						null;
+
 					//check if last sync was more than 5mins ago
-					if (!(!is_null($lastSync) && (new DateTime())->getTimeStamp() - $lastSync->getTimeStamp() < 5 * 60)
-						|| is_null($playlistsMapper->lastSync)) {
+					if ($lastSync && (new DateTime())->getTimeStamp() - $lastSync->getTimeStamp() > 5 * 60) {
 						$dbVideos = is_null($playlistsMapper->videos) ?
 									array() : $db->exec("SELECT * FROM videos WHERE id IN ($playlistsMapper->videos)");
 						

@@ -21,7 +21,7 @@ class Youtubeapi {
 		
 		$json = json_decode($res['body'], true);
 		//echo "<pre>";echo print_r($json);echo "</pre>";
-		if (json_last_error() === JSON_ERROR_NONE && strpos($res['headers'][0], "200 OK") !== false) {
+		if (json_last_error() === JSON_ERROR_NONE && in_array($res['headers'][0], ['200 OK', 'HTTP/2 200'])) {
 			return $json;
 		}
 		else {
@@ -36,14 +36,14 @@ class Youtubeapi {
 				array(
 					'part'			=>	'status,snippet',
 					'playlistId'	=>	$ytid,
-					'maxResults'	=>	2,
+					'maxResults'	=>	20,
 					'key'			=>	$this->apikey,
 					'fields'		=>	'items(snippet(publishedAt,resourceId/videoId,thumbnails/high/url,title),status),nextPageToken'
 				) :
 				array (
 					'part'			=>	'status,snippet',
 					'playlistId'	=>	$ytid,
-					'maxResults'	=>	2,
+					'maxResults'	=>	20,
 					'pageToken'	=>	$nextPageToken,
 					'key'			=>	$this->apikey,
 					'fields'		=>	'items(snippet(publishedAt,resourceId/videoId,thumbnails/high/url,title),status),nextPageToken'
@@ -53,7 +53,7 @@ class Youtubeapi {
 		
 		$json = json_decode($res['body'], true);
 		// echo "<pre>";var_dump($res);echo "</pre>";
-		if (json_last_error() === JSON_ERROR_NONE && strpos($res['headers'][0], "200 OK") !== false) {
+		if (json_last_error() === JSON_ERROR_NONE && in_array($res['headers'][0], ['200 OK', 'HTTP/2 200'])) {
 			return $json;
 		}
 		else {
